@@ -1,0 +1,5 @@
+openai
+transformers
+pyyaml
+fuzzywuzzy
+python-Levenshtein
