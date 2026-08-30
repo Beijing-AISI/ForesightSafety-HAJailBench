@@ -1,22 +1,10 @@
 # Efficient LLM Safety Evaluation through Multi-Agent Debate
 
-A standalone implementation of the **Multi-Agent Judge (MAJ)** used in *Efficient LLM Safety Evaluation through Multi-Agent Debate*. Given a user goal and a model response, MAJ produces a **1–10 risk score** (1 = completely safe, 10 = completely unsafe) by running a structured multi-agent debate between a *Critic* (argues the response is unsafe) and a *Defender* (argues it is safe), then issuing a final verdict.
+A standalone implementation of the **Multi-Agent Judge (MAJ)** used in *Efficient LLM Safety Evaluation through Multi-Agent Debate* ([arXiv:2511.06396](https://arxiv.org/abs/2511.06396)). Given a user goal and a model response, MAJ produces a **1–10 risk score** (1 = completely safe, 10 = completely unsafe) by running a structured multi-agent debate between a *Critic* (argues the response is unsafe) and a *Defender* (argues it is safe), then issuing a final verdict.
 
 This package is a clean-room repackaging of the judge used to evaluate the **HAJailBench** benchmark. It is designed to run against any OpenAI-compatible endpoint (tested with **vLLM `0.8.5`** serving Qwen3-14B) and is validated with the Qwen3 family of models.
 
 > **v3 change:** each judged item now also records `prompt_tokens` and `completion_tokens`, so per-item inference cost can be computed downstream.
-
----
-
-## How it works
-
-The judge is a single LLM serving multiple roles via prompted, continual generation:
-
-1. **Refusal check** — very short responses or refusals containing *sorry / can't / cannot* are classified by a refusal prompt; a pure refusal short-circuits to `score = 1`.
-2. **Aspect selection** — the response is summarized into the 5 most relevant safety aspects, drawn from a pool of 15 predefined harmful-intent fields (or free-form fields / hardcoded placeholders for ablations).
-3. **Noise removal** — meaningless noise strings (random/chaotic tokens) are detected and stripped from the response before judging.
-4. **Multi-round debate** — the *Critic* and *Defender* exchange point-by-point arguments and re-assess the risk level each round. Debate stops early when both sides reach the same risk level or the Critic declares the response safe. A final risk level is derived from the debate.
-5. **Final judge** — an impartial judge reviews the debate transcript and outputs either a coarse risk level (`completely safe` … `completely unsafe`) or a numeric `Risk Score: [[X]]` in **[1, 10]**.
 
 
 ---
@@ -204,12 +192,13 @@ python debug_continuation_test.py \
 If you use this code or the HAJailBench benchmark, please cite:
 
 ```bibtex
-@inproceedings{lin-etal-2026-efficient,
-  title     = {Efficient LLM Safety Evaluation through Multi-Agent Debate},
-  author    = {Dachuan Lin and Guobin Shen and Zihao Yang and Tianrong Liu and Dongcheng Zhao and Yi Zeng},
-  booktitle = {Proceedings of the 2026 Conference on Empirical Methods in Natural Language Processing},
-  publisher = {Association for Computational Linguistics},
-  address   = {Budapest, Hungary},
-  year      = {2026}
+@misc{lin2026efficientllmsafetyevaluation,
+      title={Efficient LLM Safety Evaluation through Multi-Agent Debate},
+      author={Dachuan Lin and Guobin Shen and Zihao Yang and Tianrong Liu and Dongcheng Zhao and Yi Zeng},
+      year={2026},
+      eprint={2511.06396},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2511.06396},
 }
 ```
